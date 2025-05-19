@@ -9,7 +9,8 @@
   "license": "ISC",
   "description": "API para um aplicativo de gerenciamento de tarefas.",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
