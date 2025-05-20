@@ -105,6 +105,37 @@ class TeamsController {
 
       return response.status(204).json();
   }
+
+  async forceRemove(request: Request, response: Response){
+      const paramsSchema = z.object({
+        id: z.string().uuid(),
+      })
+
+      const { id } = paramsSchema.parse(request.params)
+
+      const teamExists = await prisma.team.findFirst({
+        where: { id },
+        include: { members: true },
+      })
+
+      if (!teamExists) {
+          throw new AppError("Team not found", 404)
+      }
+
+      await prisma.teamMember.deleteMany({
+        where: {
+          teamId: id,
+        },
+      })
+
+      await prisma.team.delete({
+        where: {
+          id,
+        },
+      })
+
+      return response.status(204).json()
+  }
   
 }
 

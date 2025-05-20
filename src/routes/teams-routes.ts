@@ -14,5 +14,6 @@ teamsRoutes.post("/", teamsController.create)
 teamsRoutes.get("/", teamsController.index)
 teamsRoutes.put("/:id", teamsController.update)
 teamsRoutes.delete("/:id", teamsController.remove)
+teamsRoutes.delete("/:id/force", teamsController.forceRemove)
 
 export { teamsRoutes}
