@@ -6,8 +6,8 @@ import { AppError } from "@/utils/AppError"
 class TeamsController {
   async create(request: Request, response: Response){
     const bodySchema = z.object({
-      name: z.string(),
-      description: z.string()
+      name: z.string().trim().min(2),
+      description: z.string().trim().min(2)
     })
 
     const {name, description} = bodySchema.parse(request.body)
