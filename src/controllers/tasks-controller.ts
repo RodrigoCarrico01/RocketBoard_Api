@@ -40,6 +40,27 @@ class TasksController{
 
       return response.status(201).json(task)
     }
+    async index(request: Request, response: Response){
+
+      if(request.user?.role === "member"){
+        const member = await prisma.teamMember.findFirst({
+          where: {
+            userId: request.user?.id
+          }
+        })
+
+        const task = await prisma.task.findMany({
+          where: {
+            teamId: member?.teamId
+          }
+        })
+
+        return response.json(task)
+      } else if (request.user?.role === "admin"){
+        const task = await prisma.task.findMany({})
+        return response.json(task)
+      }
+    }
 }
 
 export {TasksController}

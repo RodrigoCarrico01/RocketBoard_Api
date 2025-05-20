@@ -10,7 +10,7 @@ const tasksController = new TasksController()
 
 tasksRoutes.use(ensureAuthenticated)
 
-
 tasksRoutes.post("/", verifyUserAuthorization(["admin"]), tasksController.create)
+tasksRoutes.get("/", verifyUserAuthorization(["member","admin"]), tasksController.index)
 
 export {tasksRoutes}
