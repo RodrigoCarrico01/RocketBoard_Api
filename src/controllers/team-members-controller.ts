@@ -1,6 +1,7 @@
 import {Request, Response} from "express"
 import {z} from "zod"
 import { prisma } from "@/database/prisma"
+import { AppError } from "@/utils/AppError"
 
 class TeamMembersController {
   async create(request: Request, response: Response){
@@ -11,14 +12,14 @@ class TeamMembersController {
 
     const {user_id, team_id} = bodySchema.parse(request.body)
 
-    await prisma.teamMember.create({
+     const member = await prisma.teamMember.create({
       data: {
         userId: user_id,
         teamId: team_id
       }
     })
 
-    return response.status(201).json()
+    return response.status(201).json(member)
   }
 
   async index(request: Request, response: Response){
@@ -51,6 +52,28 @@ class TeamMembersController {
 
     }));
     return response.json(members)
+  }
+
+  async remove(request: Request, response: Response){
+      const paramsSchema = z.object({
+        id: z.string().uuid(),
+      })
+
+      const { id } = paramsSchema.parse(request.params)
+
+      const teamMemberExists = await prisma.teamMember.findFirst({
+        where: { id },
+      })
+
+      if(!teamMemberExists){
+        throw new AppError("Team member not found", 404)
+      }
+      
+      await prisma.teamMember.delete({
+        where: {id}
+      })
+
+      return response.status(204).json()
   }
 
 }
