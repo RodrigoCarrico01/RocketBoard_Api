@@ -52,6 +52,7 @@ class TeamMembersController {
     }));
     return response.json(members)
   }
+
 }
 
 export {TeamMembersController}
