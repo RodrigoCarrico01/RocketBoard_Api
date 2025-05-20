@@ -20,6 +20,38 @@ class TeamMembersController {
 
     return response.status(201).json()
   }
+
+  async index(request: Request, response: Response){
+    const rawMembers = await prisma.teamMember.findMany({
+      select: { 
+        id: true,
+        user: { 
+          select: {id: true, name: true, email: true}
+        },
+        team: {
+          select:{id: true, name: true, description:true}
+        },
+        createdAt: true
+      },
+    })
+
+    const members = rawMembers.map(member => ({
+
+      memberId: member.id,
+      user: {
+          userId: member.user.id,
+          name: member.user.name,
+          email: member.user.email,
+      },
+      team: {
+          teamId: member.team.id,
+          teamName: member.team.name,
+          teamDescription: member.team.description,
+      },
+
+    }));
+    return response.json(members)
+  }
 }
 
 export {TeamMembersController}
