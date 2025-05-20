@@ -50,6 +50,27 @@ class TasksController{
         })
 
         const task = await prisma.task.findMany({
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            priority: true,
+            assignee: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            },
+            team: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+              }
+            }
+          },
           where: {
             teamId: member?.teamId
           }
@@ -57,7 +78,28 @@ class TasksController{
 
         return response.json(task)
       } else if (request.user?.role === "admin"){
-        const task = await prisma.task.findMany({})
+        const task = await prisma.task.findMany({          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+            priority: true,
+            assignee: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            },
+            team: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+              }
+            }
+          }
+        })
         return response.json(task)
       }
     }
