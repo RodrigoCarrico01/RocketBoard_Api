@@ -12,5 +12,7 @@ tasksRoutes.use(ensureAuthenticated)
 
 tasksRoutes.post("/", verifyUserAuthorization(["admin"]), tasksController.create)
 tasksRoutes.get("/", verifyUserAuthorization(["member","admin"]), tasksController.index)
+tasksRoutes.put("/:id", verifyUserAuthorization(["member","admin"]), tasksController.update)
+tasksRoutes.delete("/:id", verifyUserAuthorization(["admin"]), tasksController.remove)
 
 export {tasksRoutes}

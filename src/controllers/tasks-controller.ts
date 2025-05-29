@@ -103,6 +103,93 @@ class TasksController{
         return response.json(task)
       }
     }
+    async update(request: Request, response: Response){
+      const paramsSchema = z.object({
+        id: z.string().uuid(),
+      })
+
+      const bodySchema = z.object({
+        title: z.string().trim().min(2).optional(),
+        description: z.string().trim().min(2).optional(),
+        status: z.enum(["pending","in_progress","completed","canceled"]).optional(),
+        priority: z.enum(["high","medium","low"]).optional(),
+        assigned_to: z.string().uuid().optional(),
+      })
+
+      if(request.user?.role === "member"){
+        const member = await prisma.teamMember.findFirst({
+          where: {
+            userId: request.user?.id
+          }
+        })
+
+        if(!member){
+          throw new AppError("You are not a member of any team.", 403)
+        }
+
+        const {id} = paramsSchema.parse(request.params)
+        const {title, description, status, priority, assigned_to} = bodySchema.parse(request.body)
+
+        const task = await prisma.task.update({
+          where: {
+            id,
+            teamId: member.teamId
+          },
+          data: {
+            title,
+            description,
+            status,
+            priority,
+            assignedTo: assigned_to
+          }
+        })
+
+        return response.json(task)
+
+
+
+      } else if(request.user?.role === "admin") {
+        const {id} = paramsSchema.parse(request.params)
+        const {title, description, status, priority, assigned_to} = bodySchema.parse(request.body)
+
+        const task = await prisma.task.update({
+          where: {
+            id,
+          },
+          data: {
+            title,
+            description,
+            status,
+            priority,
+            assignedTo: assigned_to
+          }
+        })
+
+        return response.json(task)
+      }
+
+    }
+    async remove(request: Request, response: Response){
+      const paramsSchema = z.object({
+        id: z.string().uuid(),
+      })
+
+      const { id } = paramsSchema.parse(request.params)
+
+      const taskExists = await prisma.task.findFirst({
+        where: { id },
+      })
+
+      if(!taskExists){
+        throw new AppError("Task not found", 404)
+      }
+
+      await prisma.task.delete({
+        where: {id}
+      })
+
+      return response.status(204).json()
+    }
 }
 
 export {TasksController}

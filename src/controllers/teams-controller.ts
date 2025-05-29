@@ -81,12 +81,20 @@ class TeamsController {
         include: { members: true },
       })
 
+      const taskExists = await prisma.task.findFirst({
+        where: { teamId: id },
+      })
+
       if(!teamExists){
         throw new AppError("Team not found", 404)
       }
 
       if (teamExists.members.length > 0) {
         throw new AppError("Delete team members first!")
+      }
+
+      if (taskExists) {
+        throw new AppError("Delete tasks first!")
       }
 
       await prisma.team.delete({
@@ -111,6 +119,12 @@ class TeamsController {
       if (!teamExists) {
           throw new AppError("Team not found", 404)
       }
+
+      await prisma.task.deleteMany({
+        where: { 
+          teamId: id,
+        },
+      })
 
       await prisma.teamMember.deleteMany({
         where: {
